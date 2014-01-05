@@ -2,7 +2,7 @@
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,6 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="static/css/normalize.css">
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="static/css/main.css">
         <script src="static/vendor/modernizr/modernizr.js"></script>
     </head>
@@ -19,10 +20,59 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-        <p>Hello world!</p>
+        <!-- Header -->
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <img src="/static/img/logo.png" class="logo" />
+                <a href="#" class="navbar-brand">Cloud IRC</a>
+            </div>
+        </div>
+        <!-- Content -->
+        <div class="container">
+            <div class="row content">
+                <div class="col-md-2 well commands">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <strong>Commands</strong>
+                        </div>
+                        <div class="list-group">
+                            <a class="list-group-item">/rooms<span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
+                            <a class="list-group-item">/join chat<span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
+                            <a class="list-group-item">/leave<span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
+                            <a class="list-group-item">/quit<span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-10 well window">
+                    <div class="panel panel-info window-panel">
+                        <div class="panel-heading">
+                            <strong>Chat window</strong>
+                        </div>
+                        <div class="panel-body window-body">
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <!-- Footer -->
+        <div class="navbar navbar-inverse navbar-fixed-bottom footer">
+            <div class="navbar-inner">
+                <form class="navbar-form form-horizontal" role="form">
+                        <div class="col-md-10 col-xs-8">
+                            <input type="text" class="form-control input-lg" placeholder="Type here..">
+                        </div>
+                        <div class="col-md-2 col-xs-4">
+                            <button type="button" class="btn btn-success btn-lg btn-block">Send</button>
+                        </div>
+                        <div class="clearfix"></div>
+                </form>
+            </div>
+        </div>
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="static/vendor/jquery/jquery.min.js"><\/script>')</script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
         <script src="static/js/plugins.js"></script>
         <script src="static/js/main.js"></script>
     </body>

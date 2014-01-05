@@ -6,7 +6,6 @@
   "main": "app.js",
   "dependencies": {
     "jquery": "1.9.1",
-    "bootstrap": "2.3.2",
     "modernizr": "2.6.2"
   },
   "keywords": [

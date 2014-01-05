@@ -97,21 +97,52 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
+html, body {
+    height: 100%;
+    background-color: #e4e4e4;
+}
 
+.logo {
+    float: left;
+    margin: 5px;
+}
 
+.content {
+    margin: 60px 20px 75px 20px;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    min-height: 275px;
+}
 
+.commands, .window {
+    margin: 0;
+    height: 100%;
+}
 
+.panel {
+    margin: 0;
+}
 
+.window-panel {
+    height: 100%;
+}
+.window-body {
+    margin: 20px;
+    overflow: auto;
+    left: 0;
+    right: 0;
+    top: 50px;
+    bottom: 0;
+    position: absolute;
+    min-height: 100px;
+}
 
-
-
-
-
-
-
-
-
-
+.footer {
+    height: 65px;
+}
 
 /* ==========================================================================
    Helper classes
