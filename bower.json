@@ -1,0 +1,28 @@
+{
+  "name": "cloud-irc",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Cloud IRC",
+  "main": "app.js",
+  "dependencies": {
+    "jquery": "1.9.1",
+    "bootstrap": "2.3.2",
+    "modernizr": "2.6.2"
+  },
+  "keywords": [
+    "irc",
+    "chat"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/vendor",
+    "test",
+    "tests"
+  ],
+  "license": "MIT",
+  "authors": [
+    "Yugal Jindle <yugalmait@gmail.com>"
+  ]
+}

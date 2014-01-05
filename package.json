@@ -1,0 +1,24 @@
+{
+  "name": "cloud-irc",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Cloud IRC",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "consolidate": "~0.10.0",
+    "socket.io": "~0.9.16",
+    "express": "~3.4.7",
+    "mustache": "~0.8.1",
+    "connect-favicons": "0.0.4"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "irc",
+    "chat"
+  ],
+  "license": "MIT",
+  "author": "Yugal Jindle <yugalmait@gmail.com>"
+}
