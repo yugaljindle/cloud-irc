@@ -1,5 +1,6 @@
 // Imports
-var sanitize = require('validator').sanitize;
+var sanitize = require('validator').sanitize,
+    __ = require('underscore')._;
 
 module.exports = function(server) {
     var io = require('socket.io').listen(server);
@@ -19,21 +20,19 @@ module.exports = function(server) {
     *  };
     */
 
+    // JS helper functions
+    String.prototype.startsWith = function(needle) {
+        return(this.indexOf(needle) == 0);
+    };
+
     // Shared state
     var users = [],
+        validCommands,
         rooms = [
             'python_room',
             'javascript_room',
             'design_room'
         ];
-
-    // Array helper
-    Array.prototype.contains = function(k) {
-        for(var p in this)
-            if(this[p] === k)
-                return true;
-        return false;
-    }
 
     // Respond
     function respond(socket, message, type) {
@@ -50,13 +49,74 @@ module.exports = function(server) {
         if(hasSpace) {
             msg = '`'+ username +'` : Username can-not contain space';
             respond(socket, msg, 'alert-red');
+            respond(socket, 'Choose a username ?', 'alert-green');
             return false;
-        } else if(users.contains(username)) {
+        } else if(username.startsWith('/')) {
+            msg = '`'+ username +'` : Username can-not start with `/`'; 
+            respond(socket, msg, 'alert-red');
+            respond(socket, 'Choose a username ?', 'alert-green');
+            return false;
+        } else if(__.indexOf(users, username) !== -1) {
             msg = '`'+ username +'` : Username is already taken'; 
             respond(socket, msg, 'alert-red');
+            respond(socket, 'Choose a username ?', 'alert-green');
             return false;
         }
         return true;
+    }
+
+    // Valid Commands
+    function cmdRooms(socket, username, room, cmd) {
+        var roomsStr = rooms.join('<br />');
+        roomsStr = 'Rooms :<br />' + roomsStr;
+        if(cmd === '/rooms') {
+            respond(socket, roomsStr, 'alert-normal');
+            return true;
+        }
+        return false;
+    }
+    function cmdJoin(socket, username, room, cmd) {
+        return false;
+    }
+    function cmdLeave(socket, username, room, cmd) {
+        return false;
+    }
+    function cmdQuit(socket, username, room, cmd) {
+        if(cmd === '/quit') {
+            var index = users.indexOf(username);
+            console.log(users);
+            users.splice(index, 1);
+            console.log(users);
+            respond(socket, ' ===== Bye @'+ username +' - Quitting chat ===== ', 'alert-red');
+            // TODO: Broadcast to room that this user left
+            socket.disconnect();
+            return true;
+        }
+        return false;
+    }
+    validCommands = {
+        '/rooms'    : cmdRooms,
+        '/join'     : cmdJoin,
+        '/leave'    : cmdLeave,
+        '/quit'     : cmdQuit
+    };
+    // Check for command
+    function command(socket, username, room, msg) {
+        var i, len, valid = false;
+        if(msg.startsWith('/')) {
+            var validCmds = __.keys(validCommands);
+            for(i=0, len=validCmds.length; i<len; i++) {
+                var cmd = validCmds[i];
+                if(msg.startsWith(cmd)) {
+                    valid = validCommands[cmd](socket, username, room, msg);
+                }
+            }
+            if(!valid) {
+                respond(socket, '`'+ msg +'` : Invalid command !', 'alert-red');
+            }
+            return true;
+        }
+        return false;
     }
 
     // Connection
@@ -64,10 +124,11 @@ module.exports = function(server) {
         // Welcome message
         respond(socket, 'Welcome to cloud-irc !', 'alert-normal');
         respond(socket, 'Choose a username ?', 'alert-green');
-        var username;
+        var username, room;
         // Receive from client
         socket.on('clientMessage', function(data) {
             var msg = sanitize(data.message).escape();
+            // Get him a username
             if(!username && checkUsername(socket, msg)) {
                 username = msg; 
                 users.push(username);
@@ -75,7 +136,14 @@ module.exports = function(server) {
                 respond(socket, 'Checkout chat rooms with `/rooms`', 'alert-normal');
                 return;
             }
-            if(username) {
+            // Get him a room
+            if(username && !command(socket, username, room, msg) && !room) {
+                respond(socket, 'You must `/join` a room to chat.', 'alert-red');
+                respond(socket, 'Checkout chat rooms with `/rooms`', 'alert-normal');
+                return;
+            }
+            // Have username & inside a room
+            if(username && room && !command(socket, username, room, msg)) {
                 // Acknowledge
                 socket.emit('serverMessage', data);
                 // Broadcast
