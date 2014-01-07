@@ -12,7 +12,8 @@
     "socket.io": "~0.9.16",
     "express": "~3.4.7",
     "mustache": "~0.8.1",
-    "connect-favicons": "0.0.4"
+    "connect-favicons": "0.0.4",
+    "validator": "~2.0.0"
   },
   "devDependencies": {
     "nodemon": "*"

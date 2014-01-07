@@ -142,6 +142,7 @@ html, body {
     bottom: 0;
     position: absolute;
     min-height: 100px;
+    background-color: #4f7781;
 }
 
 .bubble {
@@ -194,6 +195,7 @@ html, body {
     margin-bottom: 10px;
 }
 .alert {
+    font-weight: bold;
     margin-bottom: 10px;
 }
 
