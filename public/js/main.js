@@ -18,6 +18,30 @@ function handleSend() {
     if(message) {
         chatbox.val('');
         send(message);
-        // HERE
     }
 }
+
+// ######### Show messages #########
+(function() {
+    var body = $('.window-body'),
+        alertTypes = {
+            normal  : '<div class="alert alert-warning well-sm"></div>',
+            red     : '<div class="alert alert-danger well-sm"></div>',
+            green   : '<div class="alert alert-success well-sm"></div>'
+        },
+        chatTypes = {
+            me      : '<div class="msg"><span class="bubble bubble-right"></span><div class="clearfix"></div></div>',
+            other   : '<div class="msg"><span class="bubble bubble-left"></span><div class="clearfix"></div></div>'
+        };
+
+    window.showAlert = function(message, type) {
+        var div = $(alertTypes[type]).html(message);
+        body.append(div);
+    }
+
+    window.showChat = function(message, type) {
+        var div = $(chatTypes[type]);
+        div.find('.bubble').html(message);
+        body.append(div);
+    }
+})();

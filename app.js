@@ -47,15 +47,42 @@ var io = require('socket.io').listen(server);
 // Data object contract
 /**
  *  data = {
- *      message: "String"
+ *      message: "chat string..",
+ *      type: "chat-me" // chat-me or chat-other
+ *  };
+ *
+ *  -- or --
+ *
+ *  data = {
+ *      message: "alert string..",
+ *      type: "alert-normal" // alert-normal or alert-red or alert-green
  *  };
  */
 
 io.sockets.on('connection', function(socket) {
-    io.sockets.emit('serverMessage', { 'message': "Hello client" });
+    // Test
+    io.sockets.emit('serverMessage', {
+        message : "This is a normal message !",
+        type    : "alert-normal"
+    });
+    io.sockets.emit('serverMessage', {
+        message : "This is a red message !",
+        type    : "alert-red"
+    });
+    io.sockets.emit('serverMessage', {
+        message : "This is a green message !",
+        type    : "alert-green"
+    });
+    io.sockets.emit('serverMessage', {
+        message : "This is your chat message !",
+        type    : "chat-me"
+    });
+    io.sockets.emit('serverMessage', {
+        message : "This is other's chat message !",
+        type    : "chat-other"
+    });
+    // Receive from client
     socket.on('clientMessage', function(data) {
-        io.sockets.emit('serverMessage', {
-            'message': data.message
-        });
+        io.sockets.emit('serverMessage', data);
     });
 });
