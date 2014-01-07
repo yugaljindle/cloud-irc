@@ -5,7 +5,7 @@
   "description": "Cloud IRC",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "nodemon app.js"
   },
   "dependencies": {
     "consolidate": "~0.10.0",
@@ -14,7 +14,9 @@
     "mustache": "~0.8.1",
     "connect-favicons": "0.0.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "*"
+  },
   "keywords": [
     "irc",
     "chat"

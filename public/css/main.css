@@ -107,6 +107,10 @@ html, body {
     margin: 5px;
 }
 
+.list-group-item {
+    cursor: pointer;
+}
+
 .content {
     margin: 60px 20px 75px 20px;
     left: 0;

@@ -37,6 +37,25 @@ app.get('/', function(req, res){
 });
 
 // Server
-http.createServer(app).listen(app.get('port'), function(){
+var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
+});
+
+// ####################### Socket.io #######################
+var io = require('socket.io').listen(server);
+
+// Data object contract
+/**
+ *  data = {
+ *      message: "String"
+ *  };
+ */
+
+io.sockets.on('connection', function(socket) {
+    io.sockets.emit('serverMessage', { 'message': "Hello client" });
+    socket.on('clientMessage', function(data) {
+        io.sockets.emit('serverMessage', {
+            'message': data.message
+        });
+    });
 });

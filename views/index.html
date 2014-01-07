@@ -36,10 +36,10 @@
                             <strong>Commands</strong>
                         </div>
                         <div class="list-group">
-                            <a class="list-group-item">/rooms<span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
-                            <a class="list-group-item">/join chat<span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
-                            <a class="list-group-item">/leave<span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
-                            <a class="list-group-item">/quit<span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
+                            <a class="list-group-item"><span class="cmd">/rooms</span><span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
+                            <a class="list-group-item"><span class="cmd">/join room#</span><span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
+                            <a class="list-group-item"><span class="cmd">/leave</span><span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
+                            <a class="list-group-item"><span class="cmd">/quit</span><span class="glyphicon glyphicon-chevron-right pull-right"></span></a>
                         </div>
                     </div>
                 </div>
@@ -69,12 +69,12 @@
         <!-- Footer -->
         <div class="navbar navbar-inverse navbar-fixed-bottom footer">
             <div class="navbar-inner">
-                <form class="navbar-form form-horizontal" role="form">
+                <form class="navbar-form form-horizontal" onsubmit="handleSend(this); return false;">
                         <div class="col-md-10 col-xs-8">
-                            <input type="text" class="form-control input-lg" placeholder="Type here..">
+                            <input type="text" id="chatbox" class="form-control input-lg" placeholder="Type here..">
                         </div>
                         <div class="col-md-2 col-xs-4">
-                            <button type="button" class="btn btn-success btn-lg btn-block">Send</button>
+                            <button type="submit" class="btn btn-success btn-lg btn-block">Send</button>
                         </div>
                         <div class="clearfix"></div>
                 </form>
@@ -83,8 +83,10 @@
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="static/vendor/jquery/jquery.min.js"><\/script>')</script>
+        <script src="/socket.io/socket.io.js"></script>
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
         <script src="static/js/plugins.js"></script>
+        <script src="static/js/client.js"></script>
         <script src="static/js/main.js"></script>
     </body>
 </html>
