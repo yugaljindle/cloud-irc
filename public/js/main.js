@@ -1,6 +1,8 @@
 // Document ready
 $(document).ready(function() {
-    $('#chatbox').focus();
+    var chatbox = $('#chatbox');
+    chatbox.focus();
+    chatbox.attr('autocomplete', 'off');
 });
 
 // Commands
@@ -37,11 +39,13 @@ function handleSend() {
     window.showAlert = function(message, type) {
         var div = $(alertTypes[type]).html(message);
         body.append(div);
+        body.scrollTop(body.height()); // Scroll to bottom
     }
 
     window.showChat = function(message, type) {
         var div = $(chatTypes[type]);
         div.find('.bubble').html(message);
         body.append(div);
+        body.scrollTop(body.height()); // Scroll to bottom
     }
 })();
