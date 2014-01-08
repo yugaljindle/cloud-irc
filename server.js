@@ -36,89 +36,90 @@ module.exports = function(server) {
         ];
 
     // Respond
-    function respond(socket, message, type) {
-        socket.emit('serverMessage', {
+    function respond(client, message, type) {
+        client.socket.emit('serverMessage', {
             message : message,
             type    : type
         });
     }
     // Respond to room
-    function respondToRoom(socket, room, message, type) {
-        socket.broadcast.to(room).emit('serverMessage', {
+    function respondToRoom(client, message, type) {
+        client.socket.broadcast.to(client.room).emit('serverMessage', {
             message : message,
             type    : type
         });
     }
 
     // Validate username
-    function checkUsername(socket, username) {
+    function checkUsername(client, username) {
         var msg,
             hasSpace = (username.indexOf(' ') !== -1);
         if(hasSpace) {
             msg = '`'+ username +'` : Username can-not contain space';
-            respond(socket, msg, 'alert-red');
-            respond(socket, 'Choose a username ?', 'alert-green');
+            respond(client, msg, 'alert-red');
+            respond(client, 'Choose a username ?', 'alert-green');
             return false;
         } else if(username.startsWith('/')) {
             msg = '`'+ username +'` : Username can-not start with `/`'; 
-            respond(socket, msg, 'alert-red');
-            respond(socket, 'Choose a username ?', 'alert-green');
+            respond(client, msg, 'alert-red');
+            respond(client, 'Choose a username ?', 'alert-green');
             return false;
         } else if(__.indexOf(users, username) !== -1) {
             msg = '`'+ username +'` : Username is already taken'; 
-            respond(socket, msg, 'alert-red');
-            respond(socket, 'Choose a username ?', 'alert-green');
+            respond(client, msg, 'alert-red');
+            respond(client, 'Choose a username ?', 'alert-green');
             return false;
         }
         return true;
     }
 
     // Valid Commands
-    function cmdRooms(socket, username, room, cmd) {
+    function cmdRooms(client, cmd) {
         if(cmd === '/rooms') {
             var roomsStr = rooms.join('<br />');
             roomsStr = 'Rooms :<br />' + roomsStr;
-            respond(socket, roomsStr, 'alert-normal');
+            respond(client, roomsStr, 'alert-normal');
             return true;
         }
         return false;
     }
-    function cmdJoin(socket, username, room, cmd) {
+    function cmdJoin(client, cmd) {
         var roomName = cmd.split(' ');
         roomName.splice(0, 1);
         roomName = roomName.join(' ');
         if(__.indexOf(rooms, roomName) === -1) {
             msg = 'Room `'+ roomName +'` does-not exists !';
-            respond(socket, msg, 'alert-red');
-            respond(socket, 'Checkout chat rooms with `/rooms`', 'alert-normal');
+            respond(client, msg, 'alert-red');
+            respond(client, 'Checkout chat rooms with `/rooms`', 'alert-normal');
             return true;
         } else {
-            room = roomName;
-            socket.join(roomName);
-            respond(socket, ' ===== Joined `'+ roomName +'` ===== ', 'alert-green');
+            client.room = roomName;
+            client.socket.join(roomName);
+            respond(client, ' ===== Joined `'+ client.room +'` ===== ', 'alert-green');
+            // TODO: Respond to others in room (alert-normal)
             return true;
         }
         return false;
     }
-    function cmdLeave(socket, username, room, cmd) {
+    function cmdLeave(client, cmd) {
         if(cmd === '/leave') {
-            respond(socket, ' ===== Exited room : '+ room +' ===== ', 'alert-red');
-            socket.leave(room);
-            room = undefined;
-            respondToRoom(socket, room, 'User @'+ username +' has left the room', 'alert-normal');
+            respond(client, ' ===== Exited room : '+ client.room +' ===== ', 'alert-red');
+            client.socket.leave(client.room);
+            client.room = undefined;
+            respondToRoom(client, 'User @'+ client.username +' has left the room', 'alert-normal');
             return true;
         }
         return false;
     }
-    function cmdQuit(socket, username, room, cmd) {
+    function cmdQuit(client, cmd) {
         if(cmd === '/quit') {
-            var index = users.indexOf(username);
+            var index = users.indexOf(client.username);
             console.log(users);
             users.splice(index, 1);
             console.log(users);
-            respond(socket, ' ===== Bye @'+ username +' - Quitting chat ===== ', 'alert-red');
-            respondToRoom(socket, room, 'User @'+ username +' has left the room', 'alert-normal');
-            socket.disconnect();
+            respond(client, ' ===== Bye @'+ client.username +' - Quitting chat ===== ', 'alert-red');
+            respondToRoom(client, 'User @'+ client.username +' has left the room', 'alert-normal');
+            client.socket.disconnect();
             return true;
         }
         return false;
@@ -130,18 +131,18 @@ module.exports = function(server) {
         '/quit'     : cmdQuit
     };
     // Check for command
-    function command(socket, username, room, msg) {
+    function command(client, msg) {
         var i, len, valid = false;
         if(msg.startsWith('/')) {
             var validCmds = __.keys(validCommands);
             for(i=0, len=validCmds.length; i<len; i++) {
                 var cmd = validCmds[i];
                 if(msg.startsWith(cmd)) {
-                    valid = validCommands[cmd](socket, username, room, msg);
+                    valid = validCommands[cmd](client, msg);
                 }
             }
             if(!valid) {
-                respond(socket, '`'+ msg +'` : Invalid command !', 'alert-red');
+                respond(client, '`'+ msg +'` : Invalid command !', 'alert-red');
             }
             return true;
         }
@@ -150,34 +151,38 @@ module.exports = function(server) {
 
     // Connection
     io.sockets.on('connection', function(socket) {
+        var client = {
+            username    : undefined,
+            room        : undefined,
+            socket      : socket
+        };
         // Welcome message
-        respond(socket, 'Welcome to cloud-irc !', 'alert-normal');
-        respond(socket, 'Choose a username ?', 'alert-green');
-        var username, room;
+        respond(client, 'Welcome to cloud-irc !', 'alert-normal');
+        respond(client, 'Choose a username ?', 'alert-green');
         // Receive from client
-        socket.on('clientMessage', function(data) {
+        client.socket.on('clientMessage', function(data) {
             var msg = sanitize(data.message).escape();
             // Get him a username
-            if(!username && checkUsername(socket, msg)) {
-                username = msg; 
-                users.push(username);
-                respond(socket, 'Username `'+ msg +'` granted !', 'alert-green');
-                respond(socket, 'Checkout chat rooms with `/rooms`', 'alert-normal');
+            if(!client.username && checkUsername(client, msg)) {
+                client.username = msg; 
+                users.push(client.username);
+                respond(client, 'Username `'+ client.username +'` granted !', 'alert-green');
+                respond(client, 'Checkout chat rooms with `/rooms`', 'alert-normal');
                 return;
             }
             // Get him a room
-            if(username && !command(socket, username, room, msg) && !room) {
-                respond(socket, 'You must `/join` a room to chat.', 'alert-red');
-                respond(socket, 'Checkout chat rooms with `/rooms`', 'alert-normal');
+            if(client.username && !command(client, msg) && !client.room) {
+                respond(client, 'You must `/join` a room to chat.', 'alert-red');
+                respond(client, 'Checkout chat rooms with `/rooms`', 'alert-normal');
                 return;
             }
             // Have username & inside a room
-            if(username && room && !command(socket, username, room, msg)) {
+            if(client.username && client.room && !command(client, msg)) {
                 // Acknowledge user
-                respond(socket, data.message, 'chat-me');
+                respond(client, data.message, 'chat-me');
                 // Broadcast to the room
-                data.message = '@' + username + ' : ' + data.message;
-                respondToRoom(socket, room, data.message, 'chat-other');
+                data.message = '@' + client.username + ' : ' + data.message;
+                respondToRoom(client, data.message, 'chat-other');
             }
         });
     });
