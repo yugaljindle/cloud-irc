@@ -31,12 +31,20 @@ module.exports = function(server) {
         rooms = [
             'python_room',
             'javascript_room',
-            'design_room'
+            'design_room',
+            'wash_room'
         ];
 
     // Respond
     function respond(socket, message, type) {
         socket.emit('serverMessage', {
+            message : message,
+            type    : type
+        });
+    }
+    // Respond to room
+    function respondToRoom(socket, room, message, type) {
+        socket.broadcast.to(room).emit('serverMessage', {
             message : message,
             type    : type
         });
@@ -67,18 +75,39 @@ module.exports = function(server) {
 
     // Valid Commands
     function cmdRooms(socket, username, room, cmd) {
-        var roomsStr = rooms.join('<br />');
-        roomsStr = 'Rooms :<br />' + roomsStr;
         if(cmd === '/rooms') {
+            var roomsStr = rooms.join('<br />');
+            roomsStr = 'Rooms :<br />' + roomsStr;
             respond(socket, roomsStr, 'alert-normal');
             return true;
         }
         return false;
     }
     function cmdJoin(socket, username, room, cmd) {
+        var roomName = cmd.split(' ');
+        roomName.splice(0, 1);
+        roomName = roomName.join(' ');
+        if(__.indexOf(rooms, roomName) === -1) {
+            msg = 'Room `'+ roomName +'` does-not exists !';
+            respond(socket, msg, 'alert-red');
+            respond(socket, 'Checkout chat rooms with `/rooms`', 'alert-normal');
+            return true;
+        } else {
+            room = roomName;
+            socket.join(roomName);
+            respond(socket, ' ===== Joined `'+ roomName +'` ===== ', 'alert-green');
+            return true;
+        }
         return false;
     }
     function cmdLeave(socket, username, room, cmd) {
+        if(cmd === '/leave') {
+            respond(socket, ' ===== Exited room : '+ room +' ===== ', 'alert-red');
+            socket.leave(room);
+            room = undefined;
+            respondToRoom(socket, room, 'User @'+ username +' has left the room', 'alert-normal');
+            return true;
+        }
         return false;
     }
     function cmdQuit(socket, username, room, cmd) {
@@ -88,7 +117,7 @@ module.exports = function(server) {
             users.splice(index, 1);
             console.log(users);
             respond(socket, ' ===== Bye @'+ username +' - Quitting chat ===== ', 'alert-red');
-            // TODO: Broadcast to room that this user left
+            respondToRoom(socket, room, 'User @'+ username +' has left the room', 'alert-normal');
             socket.disconnect();
             return true;
         }
@@ -144,10 +173,11 @@ module.exports = function(server) {
             }
             // Have username & inside a room
             if(username && room && !command(socket, username, room, msg)) {
-                // Acknowledge
-                socket.emit('serverMessage', data);
-                // Broadcast
-                socket.broadcast.emit('serverMessage', data);
+                // Acknowledge user
+                respond(socket, data.message, 'chat-me');
+                // Broadcast to the room
+                data.message = '@' + username + ' : ' + data.message;
+                respondToRoom(socket, room, data.message, 'chat-other');
             }
         });
     });
