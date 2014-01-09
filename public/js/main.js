@@ -39,13 +39,13 @@ function handleSend() {
     window.showAlert = function(message, type) {
         var div = $(alertTypes[type]).html(message);
         body.append(div);
-        body.scrollTop(body.height()); // Scroll to bottom
+        body.animate({scrollTop: body[0].scrollHeight}, 'slow'); // Scroll to bottom
     }
 
     window.showChat = function(message, type) {
         var div = $(chatTypes[type]);
         div.find('.bubble').html(message);
         body.append(div);
-        body.scrollTop(body.height()); // Scroll to bottom
+        body.animate({scrollTop: body[0].scrollHeight}, 'slow'); // Scroll to bottom
     }
 })();

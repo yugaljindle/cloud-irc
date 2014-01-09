@@ -62,7 +62,7 @@ module.exports = function(server) {
         var msg,
             hasSpace = (username.indexOf(' ') !== -1);
         if(hasSpace) {
-            msg = '`'+ username +'` : Username can-not contain space';
+            msg = '`'+ username +'` : Username can-not have spaces';
             respond(client, msg, 'alert-red');
             respond(client, 'Choose a username ?', 'alert-green');
             return false;

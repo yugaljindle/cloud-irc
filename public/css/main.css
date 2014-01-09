@@ -148,7 +148,6 @@ html, body {
 .bubble {
     position: relative;
     width: 250px;
-    height: 40px;
     padding: 10px;
     background: #fbffdd;
     -webkit-border-radius: 2px;
