@@ -4,6 +4,10 @@
   "private": true,
   "description": "Cloud IRC",
   "main": "app.js",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "subdomain": "yugal-cloud-irc",
   "scripts": {
     "start": "nodemon --debug app.js"
   },
