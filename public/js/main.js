@@ -5,7 +5,7 @@ $(document).ready(function() {
     chatbox.attr('autocomplete', 'off');
     chatbox.keydown(function() {
         if(window.event.keyCode === 38) {
-            var lastMessage = getLastMessage();
+            var lastMessage = dom.getLastMessage();
             chatbox.val(lastMessage);
         }
     });
@@ -23,10 +23,10 @@ $('.list-group-item').click(function(event) {
 function handleSend() {
     var chatbox = $('#chatbox'),
         message = chatbox.val();
-    setLastMessage(message);
+    dom.setLastMessage(message);
     if(message) {
         chatbox.val('');
-        send(message);
+        client.send(message);
     }
 }
 
@@ -44,24 +44,35 @@ function handleSend() {
         },
         lastMessage = '';
 
-    window.setLastMessage = function(msg) {
+    // `dom` Namespace
+    window.dom = {};
+
+    window.dom.setLastMessage = function(msg) {
         lastMessage = msg;
     };
 
-    window.getLastMessage = function() {
+    window.dom.getLastMessage = function() {
         return lastMessage;
     };
 
-    window.showAlert = function(message, type) {
+    window.dom.showAlert = function(message, type) {
         var div = $(alertTypes[type]).html(message);
         body.append(div);
         body.animate({scrollTop: body[0].scrollHeight}, 'slow'); // Scroll to bottom
     }
 
-    window.showChat = function(message, type) {
+    window.dom.showChat = function(message, type) {
         var div = $(chatTypes[type]);
         div.find('.bubble').html(message);
         body.append(div);
         body.animate({scrollTop: body[0].scrollHeight}, 'slow'); // Scroll to bottom
+    }
+
+    window.dom.disconnected = function() {
+        var chatbox = $('#chatbox');
+        msg = 'Disconnected - Refresh to restart';
+        chatbox.val(msg);
+        chatbox.prop('disabled', true);
+        alert(msg);
     }
 })();

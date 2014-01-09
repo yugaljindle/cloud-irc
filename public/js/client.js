@@ -1,6 +1,11 @@
 // Initialize
 var socket = io.connect(window.location.origin);
 
+// Disconnection
+socket.on('disconnect', function () {
+    dom.disconnected();
+});
+
 // Data object contract
 /**
  *  data = {
@@ -17,20 +22,21 @@ var socket = io.connect(window.location.origin);
  */
 
 // Send chat
-function send(message) {
+window.client = {};
+window.client.send = function(message) {
     socket.emit('clientMessage', {
         message: message,
         type: 'chat-me'
     });
-}
+};
 
 (function() {
     var msgTypes = {
-        'chat-me'       : function(message) { showChat(message, 'me') },
-        'chat-other'    : function(message) { showChat(message, 'other') },
-        'alert-normal'  : function(message) { showAlert(message, 'normal') },
-        'alert-red'     : function(message) { showAlert(message, 'red') },
-        'alert-green'   : function(message) { showAlert(message, 'green') }
+        'chat-me'       : function(message) { dom.showChat(message, 'me') },
+        'chat-other'    : function(message) { dom.showChat(message, 'other') },
+        'alert-normal'  : function(message) { dom.showAlert(message, 'normal') },
+        'alert-red'     : function(message) { dom.showAlert(message, 'red') },
+        'alert-green'   : function(message) { dom.showAlert(message, 'green') }
     };
 
     socket.on('serverMessage', function(data) {

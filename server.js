@@ -113,7 +113,7 @@ module.exports = function(server) {
             if(client.room) {
                 // If still connected
                 if(client.socket.status) {
-                    respond(client, ' ===== Exited room : '+ client.room +' ===== ', 'alert-red');
+                    respond(client, ' ===== Exited `'+ client.room +'` room ===== ', 'alert-red');
                     client.socket.leave(client.room);
                 }
                 notifyRoom(client, 'User @'+ client.username +' has left the room', 'alert-normal');
@@ -136,7 +136,7 @@ module.exports = function(server) {
                 cmdLeave(client, '/leave');
             }
             // If still connected
-            if(client.socket.connected) {
+            if(client.socket.status) {
                 respond(client, ' ===== Bye @'+ client.username +' - Quitting chat ===== ', 'alert-red');
                 client.socket.disconnect();
             }
