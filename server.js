@@ -91,19 +91,20 @@ module.exports = function(server) {
         return false;
     }
     function cmdJoin(client, cmd) {
-        var roomName = cmd.split(' ');
-        roomName.splice(0, 1);
-        roomName = roomName.join(' ');
-        if(__.indexOf(rooms, roomName) === -1) {
-            msg = 'Room `'+ roomName +'` does-not exists !';
-            respond(client, msg, 'alert-red');
-            respond(client, 'Checkout chat rooms with `/rooms`', 'alert-normal');
-            return true;
-        } else {
-            client.room = roomName;
-            client.socket.join(roomName);
-            respond(client, ' ===== Joined `'+ client.room +'` ===== ', 'alert-green');
-            respondToRoom(client, 'User @'+ client.username +' has joined in', 'alert-normal');
+        var split = cmd.split(' ');
+        if(split[0] === '/join') {
+            split.splice(0, 1);
+            roomName = split.join(' ');
+            if(__.indexOf(rooms, roomName) === -1) {
+                msg = 'Room `'+ roomName +'` does-not exists !';
+                respond(client, msg, 'alert-red');
+                respond(client, 'Checkout chat rooms with `/rooms`', 'alert-normal');
+            } else {
+                client.room = roomName;
+                client.socket.join(roomName);
+                respond(client, ' ===== Joined `'+ client.room +'` ===== ', 'alert-green');
+                respondToRoom(client, 'User @'+ client.username +' has joined in', 'alert-normal');
+            }
             return true;
         }
         return false;
@@ -190,21 +191,22 @@ module.exports = function(server) {
                 users.push(client.username);
                 respond(client, 'Username `'+ client.username +'` granted !', 'alert-green');
                 respond(client, 'Checkout chat rooms with `/rooms`', 'alert-normal');
-                return;
             }
-            // Get him a room
-            if(client.username && !command(client, msg) && !client.room) {
-                respond(client, 'You must `/join` a room to chat.', 'alert-red');
-                respond(client, 'Checkout chat rooms with `/rooms`', 'alert-normal');
-                return;
-            }
-            // Have username & inside a room
-            if(client.username && client.room && !command(client, msg)) {
-                // Acknowledge user
-                respond(client, data.message, 'chat-me');
-                // Broadcast to the room
-                data.message = '@' + client.username + ' : ' + data.message;
-                respondToRoom(client, data.message, 'chat-other');
+            // Check for command
+            else if(!command(client, msg)) {
+                // Get him a room
+                if(client.username && !client.room) {
+                    respond(client, 'You must `/join` a room to chat.', 'alert-red');
+                    respond(client, 'Checkout chat rooms with `/rooms`', 'alert-normal');
+                }
+                // Have username & inside a room
+                else if(client.username && client.room) {
+                    // Acknowledge user
+                    respond(client, data.message, 'chat-me');
+                    // Broadcast to the room
+                    data.message = '@' + client.username + ' : ' + data.message;
+                    respondToRoom(client, data.message, 'chat-other');
+                }
             }
         });
         // Disconnect

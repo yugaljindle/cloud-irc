@@ -132,6 +132,7 @@ html, body {
 
 .window-panel {
     height: 100%;
+    background-color: #4f7781;
 }
 .window-body {
     margin: 20px;

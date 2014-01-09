@@ -5,7 +5,7 @@
   "description": "Cloud IRC",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon --debug app.js"
   },
   "dependencies": {
     "consolidate": "~0.10.0",
