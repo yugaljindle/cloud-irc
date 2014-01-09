@@ -3,6 +3,12 @@ $(document).ready(function() {
     var chatbox = $('#chatbox');
     chatbox.focus();
     chatbox.attr('autocomplete', 'off');
+    chatbox.keydown(function() {
+        if(window.event.keyCode === 38) {
+            var lastMessage = getLastMessage();
+            chatbox.val(lastMessage);
+        }
+    });
 });
 
 // Commands
@@ -17,6 +23,7 @@ $('.list-group-item').click(function(event) {
 function handleSend() {
     var chatbox = $('#chatbox'),
         message = chatbox.val();
+    setLastMessage(message);
     if(message) {
         chatbox.val('');
         send(message);
@@ -34,7 +41,16 @@ function handleSend() {
         chatTypes = {
             me      : '<div class="msg"><span class="bubble bubble-right"></span><div class="clearfix"></div></div>',
             other   : '<div class="msg"><span class="bubble bubble-left"></span><div class="clearfix"></div></div>'
-        };
+        },
+        lastMessage = '';
+
+    window.setLastMessage = function(msg) {
+        lastMessage = msg;
+    };
+
+    window.getLastMessage = function() {
+        return lastMessage;
+    };
 
     window.showAlert = function(message, type) {
         var div = $(alertTypes[type]).html(message);
