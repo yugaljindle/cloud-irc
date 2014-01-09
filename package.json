@@ -7,9 +7,9 @@
   "engines": {
     "node": "0.10.x"
   },
-  "subdomain": "yugal-cloud-irc",
+  "subdomain": "yugalchat",
   "scripts": {
-    "start": "nodemon --debug app.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "consolidate": "~0.10.0",
