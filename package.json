@@ -14,7 +14,7 @@
     "mustache": "~0.8.1",
     "connect-favicons": "0.0.4",
     "validator": "~2.0.0",
-    "underscore": "~1.5.2",
+    "underscore": "~1.5.2"
   },
   "devDependencies": {
     "nodemon": "*"
