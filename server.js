@@ -35,7 +35,7 @@ module.exports = function(server) {
             'wash_room'
         ];
 
-    // Respond
+    // Respond to client
     function respond(client, message, type) {
         client.socket.emit('serverMessage', {
             message : message,
@@ -110,13 +110,20 @@ module.exports = function(server) {
     }
     function cmdLeave(client, cmd) {
         if(cmd === '/leave') {
-            // If still connected
-            if(client.socket.connected) {
-                respond(client, ' ===== Exited room : '+ client.room +' ===== ', 'alert-red');
-                client.socket.leave(client.room);
+            if(client.room) {
+                // If still connected
+                if(client.socket.status) {
+                    respond(client, ' ===== Exited room : '+ client.room +' ===== ', 'alert-red');
+                    client.socket.leave(client.room);
+                }
+                notifyRoom(client, 'User @'+ client.username +' has left the room', 'alert-normal');
+                client.room = undefined; // Clear room once everyone notified
+            } else {
+                // Havn't yet joined any-room
+                if(client.socket.status) {
+                    respond(client, "You havn't joined any room yet !", 'alert-red');
+                }
             }
-            notifyRoom(client, 'User @'+ client.username +' has left the room', 'alert-normal');
-            client.room = undefined; // Clear room once everyone notified
             return true;
         }
         return false;
@@ -124,9 +131,7 @@ module.exports = function(server) {
     function cmdQuit(client, cmd) {
         if(cmd === '/quit') {
             var index = users.indexOf(client.username);
-            console.log(users); // Temp
             users.splice(index, 1);
-            console.log(users); // Temp
             if(client.room) {
                 cmdLeave(client, '/leave');
             }
@@ -149,9 +154,9 @@ module.exports = function(server) {
     function command(client, msg) {
         var i, len, valid = false;
         if(msg.startsWith('/')) {
-            var validCmds = __.keys(validCommands);
-            for(i=0, len=validCmds.length; i<len; i++) {
-                var cmd = validCmds[i];
+            var cmds = __.keys(validCommands);
+            for(i=0, len=cmds.length; i<len; i++) {
+                var cmd = cmds[i];
                 if(msg.startsWith(cmd)) {
                     valid = validCommands[cmd](client, msg);
                 }
@@ -171,6 +176,8 @@ module.exports = function(server) {
             room        : undefined,
             socket      : socket
         };
+        // Add connection status
+        client.socket.status = true;
         // Welcome message
         respond(client, 'Welcome to cloud-irc !', 'alert-normal');
         respond(client, 'Choose a username ?', 'alert-green');
@@ -202,6 +209,7 @@ module.exports = function(server) {
         });
         // Disconnect
         client.socket.on('disconnect', function() {
+            client.socket.status = false;
             cmdQuit(client, '/quit'); // Fire /quit
         });
     });
